@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+from pymongo import MongoClient
 import requests
 import json
 import time
@@ -90,12 +91,24 @@ if st.button("Analyze"):
 
 
         #find out company_types "Service", "Product", "start-up", "R&D", "GCC"
+        COMPANY_TYPES = ["Service", "Product", "start-up", "R&D", "GCC"]
         url = "https://google.serper.dev/search"
-        # companies = ['Cognizant', 'TCS', 'Infosys', 'Wipro', 'Accenture']
         companies_type_sents = []
         companies_type = [] # list containing the type of companies: product or service based
-        for i,company in enumerate(companies):
-
+        i=0
+        for company in companies:
+            # Check if the company is already in the database
+            client = MongoClient("mongodb://localhost:27017/")
+            db = client["company_info"]
+            collection = db["company_info"]
+            collection.create_index([("Company", 1)], unique=True)
+            # Check if the company already exists in the collection
+            existing_company = collection.find_one({"Company": company})
+            if existing_company:
+                companies_type_sents.append(f"{existing_company['Type']} {existing_company['Confidence Score']}")
+                continue
+            # If the company is not in the database, make an API call to get the company type
+            # Make a request to the Serper API
             payload = json.dumps({
                 "q": f"{company} company type",
             })
@@ -106,10 +119,10 @@ if st.button("Analyze"):
             if i !=0 and i % 3 == 0:
                 # response = requests.request("POST", url, headers=headers, data=payload)
                 time.sleep(50)
+            i+=1
             response_serper = requests.request("POST", url, headers=headers, data=payload)
-            print(response_serper.text)
-            # print("invoking model for text",response.text)
-            COMPANY_TYPES = ["Service", "Product", "start-up", "R&D", "GCC"]
+            # print(response_serper.text)
+            print("invoking model for serper text")
 
             response = model.invoke([("system", f"tag the company in mentioned user message with one of the labels from {COMPANY_TYPES} along with the confidence score referring to this text : {response_serper.text} with no explanation in format of <label> <confidence_score>"),
                                     ("human", f"{company}")])
@@ -127,6 +140,23 @@ if st.button("Analyze"):
                 "Confidence Score": [line.split(" ")[1].strip(",").strip() for line in companies_type_sents]
             }
             df = pd.DataFrame(data)
+            print(df)
+            #connect to mongo db 
+            client = MongoClient("mongodb://localhost:27017/")
+            db = client["company_info"]
+            collection = db["company_info"]
+            print("connected to mongo db")
+            # Insert the data into MongoDB
+            #convert data to json format
+            data = df.to_dict(orient="records")
+            # Insert the data into MongoDB
+            collection.create_index([("Company", 1)], unique=True)
+            for record in data:
+                print(record)
+                if not collection.find_one({"Company": record["Company"]}):
+                    collection.insert_one(record)
+            # df.to_csv("company_types.csv", index=False)
+            print("Data inserted into MongoDB successfully.", df)
             st.table(df)
         except Exception as e:
             st.error(f"An error occurred while processing company types: {e}")

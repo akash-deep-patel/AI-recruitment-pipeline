@@ -12,6 +12,19 @@
                 "--server.port",
                 "2000"
             ]
+        },
+        {
+            "name": "Python:Streamlit JD",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "streamlit",
+            "args": [
+                "run",
+                "${workspaceFolder}/streamlit_app_jd.py",
+                "--server.port",
+                "2000"
+            ]
         }
+    
     ]
 }

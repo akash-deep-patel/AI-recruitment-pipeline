@@ -9,6 +9,7 @@ from langchain_community.document_loaders import Docx2txtLoader
 from langchain_core.documents import Document
 from langchain_groq import ChatGroq
 import os
+import pandas as pd
 load_dotenv()
 # Streamlit app
 st.title("Analyze Profile")
@@ -103,13 +104,26 @@ if st.button("Analyze"):
 
             response = model.invoke([("system", f"tag the company in mentioned user message with one of the labels from {COMPANY_TYPES} along with the confidence score referring to this text : {response_serper.text} with no explanation in format of <label> <confidence_score>"),
                                     ("human", f"{company}")])
-            print(response)
+            print(response.content)
             companies_type_sents.append(response.content)
-
-        for i, line in enumerate(companies_type_sents):
-            if i == 0:
-                st.write("Company, Company types and confidence scores")
-            st.write(companies[i]+" | "+line.split(" ")[0].strip()+" | "+line.split(" ")[1].strip())
+        #enclose for loop with try except to handle the errors
+        # Display the company types and confidence scores
+        st.subheader("Company Types and Confidence Scores")
+        # Display the company types and confidence scores in a table format
+        try:
+            for i, line in enumerate(companies_type_sents):
+                if i == 0:
+                    st.write("Company, Company types and confidence scores")
+                data = {
+                    "Company": companies,
+                    "Type": [line.split(" ")[0].strip() for line in companies_type_sents],
+                    "Confidence Score": [line.split(" ")[1].strip() for line in companies_type_sents]
+                }
+                df = pd.DataFrame(data)
+                st.table(df)
+        except Exception as e:
+            st.error(f"An error occurred while processing company types: {e}")
+        
         #display the experience in a table format in various company types
         experience_company_types = [0]*len(COMPANY_TYPES)
         for i, company in enumerate(companies):

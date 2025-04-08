@@ -9,3 +9,5 @@ output.csv
 parse_resume_output.json
 solution-architecture.txt
 .env
+streamlit_app_jd.py
+.vscode/launch.json

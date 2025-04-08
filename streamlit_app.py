@@ -28,7 +28,7 @@ if st.button("Analyze"):
             doc_page_contents = [" ".join(page.page_content.splitlines()) for page in doc]
             doc_content = " ".join(doc_page_contents)
             doc = Document(metadata={"source": uploaded_file.name}, page_content=doc_content)
-        elif uploaded_file.type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+        elif uploaded_file.type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document" or uploaded_file.name.endswith(".docx"):
             with open(uploaded_file.name, "wb") as temp_file:
                 temp_file.write(uploaded_file.getbuffer())
             loader = Docx2txtLoader(uploaded_file.name)

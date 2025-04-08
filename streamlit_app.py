@@ -111,16 +111,14 @@ if st.button("Analyze"):
         st.subheader("Company Types and Confidence Scores")
         # Display the company types and confidence scores in a table format
         try:
-            for i, line in enumerate(companies_type_sents):
-                if i == 0:
-                    st.write("Company, Company types and confidence scores")
-                data = {
-                    "Company": companies,
-                    "Type": [line.split(" ")[0].strip() for line in companies_type_sents],
-                    "Confidence Score": [line.split(" ")[1].strip() for line in companies_type_sents]
-                }
-                df = pd.DataFrame(data)
-                st.table(df)
+            st.write("Company, Company types and confidence scores")
+            data = {
+                "Company": companies,
+                "Type": [line.split(" ")[0].strip(",").strip() for line in companies_type_sents],
+                "Confidence Score": [line.split(" ")[1].strip(",").strip() for line in companies_type_sents]
+            }
+            df = pd.DataFrame(data)
+            st.table(df)
         except Exception as e:
             st.error(f"An error occurred while processing company types: {e}")
         

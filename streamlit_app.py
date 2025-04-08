@@ -57,10 +57,19 @@ if st.button("Analyze"):
         print("invoking model")
         ai_msg=model.invoke(messages)
         print(ai_msg.content)
-        for i, line in enumerate(ai_msg.content.split("\n")):
-            if i == 0:
-                st.write("Company names and months served")
-            st.write(line)
+        # Parse the content into a table format
+        data = []
+        for line in ai_msg.content.split("\n"):
+            if line.strip() and "-" in line:
+                company, duration = line.split("-")
+                data.append({"Company": company.split(".")[1].strip(), "Duration (Months)": duration.strip().split(" ")[0]})
+
+        # Create a DataFrame
+        df = pd.DataFrame(data)
+
+        # Display the table in Streamlit
+        st.subheader("Company Names and Months Served")
+        st.table(df)
         companies = [line.split("-")[0].split(".")[1].strip() for line in ai_msg.content.split("\n") if line.strip() and line.split("-")[0].split(".")[0] != line]
         durations = [line.split("-")[1].strip().split(" ")[0].strip() for line in ai_msg.content.split("\n") if line.strip() and line.split("-")[0].split(".")[0] != line]
         # Draw a plot for companies and respective durations and render to Streamlit UI

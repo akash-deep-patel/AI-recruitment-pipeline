@@ -60,7 +60,7 @@ if st.button("Analyze"):
             if i == 0:
                 st.write("Company names and months served")
             st.write(line)
-        companies = [line.split("-")[0].split(".")[1].strip() for line in ai_msg.content.split("\n") if line.strip()]
+        companies = [line.split("-")[0].split(".")[1].strip() for line in ai_msg.content.split("\n") if line.strip() and line.split("-")[0].split(".")[0] != line]
         durations = [line.split("-")[1].strip().split(" ")[0].strip() for line in ai_msg.content.split("\n") if line.strip()]
         # Draw a plot for companies and respective durations and render to Streamlit UI
         # Convert durations to integers

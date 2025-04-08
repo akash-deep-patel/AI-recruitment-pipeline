@@ -5,9 +5,8 @@ import time
 import streamlit as st
 from dotenv import load_dotenv
 from langchain_community.document_loaders import PyPDFLoader
-# , DocxLoader
+from langchain_community.document_loaders import Docx2txtLoader
 from langchain_core.documents import Document
-# from langchain.document_loaders import DocxLoader
 from langchain_groq import ChatGroq
 import os
 load_dotenv()
@@ -16,7 +15,7 @@ st.title("Analyze Profile")
 # File upload
 uploaded_file = st.file_uploader("Upload a PDF or DOCX file", type=["pdf", "docx"])
 model = ChatGroq(model="llama3-8b-8192", temperature=0.0)
-# Analyze button
+## Analyze button
 if st.button("Analyze"):
     if uploaded_file is not None:
         # Process the uploaded file
@@ -24,19 +23,20 @@ if st.button("Analyze"):
             with open(uploaded_file.name, "wb") as temp_file:
                 temp_file.write(uploaded_file.getbuffer())
             loader = PyPDFLoader(uploaded_file.name)
-        # elif uploaded_file.type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-        #     with open(uploaded_file.name, "wb") as temp_file:
-        #     temp_file.write(uploaded_file.getbuffer())
-        #     loader = DocxLoader(uploaded_file.name)
-        #     loader = DocxLoader(uploaded_file)
+            # Load documents
+            doc = loader.load()
+            doc_page_contents = [" ".join(page.page_content.splitlines()) for page in doc]
+            doc_content = " ".join(doc_page_contents)
+            doc = Document(metadata={"source": uploaded_file.name}, page_content=doc_content)
+        elif uploaded_file.type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+            with open(uploaded_file.name, "wb") as temp_file:
+                temp_file.write(uploaded_file.getbuffer())
+            loader = Docx2txtLoader(uploaded_file.name)
+            doc = loader.load()[0]
+
         else:
             st.error("Unsupported file type!")
             st.stop()
-        # Load documents
-        doc = loader.load()
-        doc_page_contents = [" ".join(page.page_content.splitlines()) for page in doc]
-        doc_content = " ".join(doc_page_contents)
-        doc = Document(metadata={"source": uploaded_file.name}, page_content=doc_content)
         st.success("File processed successfully!")
 
         # Display document content
@@ -49,9 +49,6 @@ if st.button("Analyze"):
         ("human", "extract following info from the context and output in json format: name, email, phone, college, experience. Experience has companies worked for, duration along with the skills used"),]
         print("invoking model")
         ai_msg=model.invoke(messages)
-        # resp_cleaned = re.sub(r'<think>\n.*\n</think>', '', ai_msg.content, flags=re.DOTALL)
-        # resp_cleaned = re.sub(r'\n', '', resp_cleaned, flags=re.DOTALL)
-        # print(ai_msg.content)
         st.write(ai_msg.content)
         
         messages = [("system", f"You are a helpful assistant with capability of answering a question from this context {context}."),  
@@ -103,7 +100,6 @@ if st.button("Analyze"):
             print(response_serper.text)
             # print("invoking model for text",response.text)
             COMPANY_TYPES = ["Service", "Product", "start-up", "R&D", "GCC"]
-            # ("system", f"answer user question in terms of product or service-based along with a confidence score referring to this text : {response.text} with no explanation")
 
             response = model.invoke([("system", f"tag the company in mentioned user message with one of the labels from {COMPANY_TYPES} along with the confidence score referring to this text : {response_serper.text} with no explanation in format of <label> <confidence_score>"),
                                     ("human", f"{company}")])
@@ -114,8 +110,6 @@ if st.button("Analyze"):
             if i == 0:
                 st.write("Company, Company types and confidence scores")
             st.write(companies[i]+" | "+line.split(" ")[0].strip()+" | "+line.split(" ")[1].strip())
-            # companies_type.append(line.split(" ")[0].strip())
-            # companies_type.append(line.split(" ")[0].strip().split("<")[1].strip())
         #display the experience in a table format in various company types
         experience_company_types = [0]*len(COMPANY_TYPES)
         for i, company in enumerate(companies):
@@ -132,8 +126,6 @@ if st.button("Analyze"):
         plt.tight_layout()
         # Render the plot in Streamlit
         st.pyplot(plt)
-        
-
         
     else:
         st.error("Please upload a file before analyzing.")

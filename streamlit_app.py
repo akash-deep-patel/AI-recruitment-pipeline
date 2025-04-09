@@ -110,7 +110,7 @@ if st.button("Analyze"):
             # If the company is not in the database, make an API call to get the company type
             # Make a request to the Serper API
             payload = json.dumps({
-                "q": f"{company} company type",
+                "q": f"which of the following type: Product, Service, GCC, R&D does company {company} belong to?",
             })
             headers = {
                 'X-API-KEY': 'b7b560827bca711a1a8918e64d023fe353a30c4d',
@@ -121,7 +121,7 @@ if st.button("Analyze"):
                 time.sleep(50)
             i+=1
             response_serper = requests.request("POST", url, headers=headers, data=payload)
-            # print(response_serper.text)
+            print(response_serper.text)
             print("invoking model for serper text")
 
             response = model.invoke([("system", f"tag the company in mentioned user message with one of the labels from {COMPANY_TYPES} along with the confidence score referring to this text : {response_serper.text} with no explanation in format of <label> <confidence_score>"),

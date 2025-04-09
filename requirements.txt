@@ -4,7 +4,6 @@ langchain_groq
 langchain_huggingface
 pymupdf
 docx2txt
-faiss-cpu
 pymongo
 matplotlib
 pypdf

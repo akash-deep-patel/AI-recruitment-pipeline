@@ -98,15 +98,15 @@ if st.button("Analyze"):
         i=0
         for company in companies:
             # Check if the company is already in the database
-            client = MongoClient("mongodb://localhost:27017/")
-            db = client["company_info"]
-            collection = db["company_info"]
-            collection.create_index([("Company", 1)], unique=True)
-            # Check if the company already exists in the collection
-            existing_company = collection.find_one({"Company": company})
-            if existing_company:
-                companies_type_sents.append(f"{existing_company['Type']} {existing_company['Confidence Score']}")
-                continue
+            # client = MongoClient("mongodb://localhost:27017/")
+            # db = client["company_info"]
+            # collection = db["company_info"]
+            # collection.create_index([("Company", 1)], unique=True)
+            # # Check if the company already exists in the collection
+            # existing_company = collection.find_one({"Company": company})
+            # if existing_company:
+            #     companies_type_sents.append(f"{existing_company['Type']} {existing_company['Confidence Score']}")
+            #     continue
             # If the company is not in the database, make an API call to get the company type
             # Make a request to the Serper API
             payload = json.dumps({
@@ -142,21 +142,21 @@ if st.button("Analyze"):
             df = pd.DataFrame(data)
             print(df)
             #connect to mongo db 
-            client = MongoClient("mongodb://localhost:27017/")
-            db = client["company_info"]
-            collection = db["company_info"]
-            print("connected to mongo db")
-            # Insert the data into MongoDB
-            #convert data to json format
-            data = df.to_dict(orient="records")
-            # Insert the data into MongoDB
-            collection.create_index([("Company", 1)], unique=True)
-            for record in data:
-                print(record)
-                if not collection.find_one({"Company": record["Company"]}):
-                    collection.insert_one(record)
-            # df.to_csv("company_types.csv", index=False)
-            print("Data inserted into MongoDB successfully.", df)
+            # client = MongoClient("mongodb://localhost:27017/")
+            # db = client["company_info"]
+            # collection = db["company_info"]
+            # print("connected to mongo db")
+            # # Insert the data into MongoDB
+            # #convert data to json format
+            # data = df.to_dict(orient="records")
+            # # Insert the data into MongoDB
+            # collection.create_index([("Company", 1)], unique=True)
+            # for record in data:
+            #     print(record)
+            #     if not collection.find_one({"Company": record["Company"]}):
+            #         collection.insert_one(record)
+            # # df.to_csv("company_types.csv", index=False)
+            # print("Data inserted into MongoDB successfully.", df)
             st.table(df)
         except Exception as e:
             st.error(f"An error occurred while processing company types: {e}")

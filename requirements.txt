@@ -9,3 +9,5 @@ matplotlib
 pandas
 pypdf
 streamlit
+google-cloud-firestore
+firebase_admin

@@ -141,6 +141,24 @@ if st.button("Analyze"):
             }
             df = pd.DataFrame(data)
             print(df)
+            #insert to firestore
+            #storing the data in firestore
+            import firebase_admin
+            from firebase_admin import credentials
+            from firebase_admin import firestore
+            cred = credentials.Certificate(os.getenv("GOOGLE_APPLICATION_CREDENTIALS"))
+            firebase_admin.initialize_app(cred)
+            db = firestore.client()
+            for index, row in df.iterrows():
+                doc_ref = db.collection("company_info").document(row["Company"])
+                doc_ref.set({
+                    "Company": row["Company"],
+                    "Type": row["Type"],
+                    "Confidence Score": row["Confidence Score"]
+                })
+                print(f"Document {row['Company']} added to Firestore.")
+
+
             #connect to mongo db 
             # client = MongoClient("mongodb://localhost:27017/")
             # db = client["company_info"]

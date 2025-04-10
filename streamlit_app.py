@@ -143,22 +143,22 @@ if st.button("Analyze"):
             print(df)
             #insert to firestore    
             #storing the data in firestore
-            import firebase_admin
-            from firebase_admin import credentials
-            from firebase_admin import firestore
-            print("initializing firebase")
-            print(os.getenv("GOOGLE_APPLICATION_CREDENTIALS"))
-            # cred = credentials.Certificate(os.getenv("GOOGLE_APPLICATION_CREDENTIALS"))
-            firebase_admin.initialize_app()
-            db = firestore.client(database_id="company-info")
-            for index, row in df.iterrows():
-                doc_ref = db.collection("company-info").document(row["Company"])
-                doc_ref.set({
-                    "Company": row["Company"],
-                    "Type": row["Type"],
-                    "Confidence Score": row["Confidence Score"]
-                })
-                print(f"Document {row['Company']} added to Firestore.")
+            # import firebase_admin
+            # from firebase_admin import credentials
+            # from firebase_admin import firestore
+            # print("initializing firebase")
+            # print(os.getenv("GOOGLE_APPLICATION_CREDENTIALS"))
+            # # cred = credentials.Certificate(os.getenv("GOOGLE_APPLICATION_CREDENTIALS"))
+            # firebase_admin.initialize_app()
+            # db = firestore.client(database_id="company-info")
+            # for index, row in df.iterrows():
+            #     doc_ref = db.collection("company-info").document(row["Company"])
+            #     doc_ref.set({
+            #         "Company": row["Company"],
+            #         "Type": row["Type"],
+            #         "Confidence Score": row["Confidence Score"]
+            #     })
+            #     print(f"Document {row['Company']} added to Firestore.")
 
 
             #connect to mongo db 

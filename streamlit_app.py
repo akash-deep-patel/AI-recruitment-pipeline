@@ -150,7 +150,7 @@ if st.button("Analyze"):
             print(os.getenv("GOOGLE_APPLICATION_CREDENTIALS"))
             # cred = credentials.Certificate(os.getenv("GOOGLE_APPLICATION_CREDENTIALS"))
             firebase_admin.initialize_app()
-            db = firestore.client(database="company-info")
+            db = firestore.client(database_id="company-info")
             for index, row in df.iterrows():
                 doc_ref = db.collection("company-info").document(row["Company"])
                 doc_ref.set({

@@ -141,14 +141,14 @@ if st.button("Analyze"):
             }
             df = pd.DataFrame(data)
             print(df)
-            #insert to firestore
+            #insert to firestore    
             #storing the data in firestore
             import firebase_admin
             from firebase_admin import credentials
             from firebase_admin import firestore
             cred = credentials.Certificate(os.getenv("GOOGLE_APPLICATION_CREDENTIALS"))
             firebase_admin.initialize_app(cred)
-            db = firestore.client()
+            db = firestore.client(database="company_info")
             for index, row in df.iterrows():
                 doc_ref = db.collection("company_info").document(row["Company"])
                 doc_ref.set({

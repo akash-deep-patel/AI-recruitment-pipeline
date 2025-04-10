@@ -146,6 +146,8 @@ if st.button("Analyze"):
             import firebase_admin
             from firebase_admin import credentials
             from firebase_admin import firestore
+            print("initializing firebase")
+            print(os.getenv("GOOGLE_APPLICATION_CREDENTIALS"))
             cred = credentials.Certificate(os.getenv("GOOGLE_APPLICATION_CREDENTIALS"))
             firebase_admin.initialize_app(cred)
             db = firestore.client(database="company-info")

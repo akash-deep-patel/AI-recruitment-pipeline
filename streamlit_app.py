@@ -148,8 +148,8 @@ if st.button("Analyze"):
             from firebase_admin import firestore
             print("initializing firebase")
             print(os.getenv("GOOGLE_APPLICATION_CREDENTIALS"))
-            cred = credentials.Certificate(os.getenv("GOOGLE_APPLICATION_CREDENTIALS"))
-            firebase_admin.initialize_app(cred)
+            # cred = credentials.Certificate(os.getenv("GOOGLE_APPLICATION_CREDENTIALS"))
+            firebase_admin.initialize_app()
             db = firestore.client(database="company-info")
             for index, row in df.iterrows():
                 doc_ref = db.collection("company-info").document(row["Company"])

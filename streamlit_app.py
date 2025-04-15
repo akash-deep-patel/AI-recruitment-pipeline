@@ -98,10 +98,11 @@ if st.button("Analyze"):
         i=0
         for company in companies:
             # Check if the company is already in the database
-            client = MongoClient("mongodb://localhost:27017/")
+            mongo_user = os.getenv("MONGO_USER")
+            mongo_password = os.getenv("MONGO_PASSWORD")
+            client = MongoClient(f"mongodb+srv://{mongo_user}:{mongo_password}@hirewand-genai-cluster.dcovpmo.mongodb.net/?retryWrites=true&w=majority&appName=hirewand-genai-cluster")
             db = client["company_info"]
             collection = db["company_info"]
-            collection.create_index([("Company", 1)], unique=True)
             # Check if the company already exists in the collection
             existing_company = collection.find_one({"Company": company})
             if existing_company:
@@ -128,7 +129,7 @@ if st.button("Analyze"):
                                     ("human", f"{company}")])
             print(response.content)
             companies_type_sents.append(response.content)
-            
+
         #enclose for loop with try except to handle the errors
         # Display the company types and confidence scores
         st.subheader("Company Types and Confidence Scores")

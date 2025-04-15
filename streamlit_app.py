@@ -141,42 +141,26 @@ if st.button("Analyze"):
             }
             df = pd.DataFrame(data)
             print(df)
-            #insert to firestore    
-            #storing the data in firestore
-            # import firebase_admin
-            # from firebase_admin import credentials
-            # from firebase_admin import firestore
-            # print("initializing firebase")
-            # print(os.getenv("GOOGLE_APPLICATION_CREDENTIALS"))
-            # # cred = credentials.Certificate(os.getenv("GOOGLE_APPLICATION_CREDENTIALS"))
-            # firebase_admin.initialize_app()
-            # db = firestore.client(database_id="company-info")
-            # for index, row in df.iterrows():
-            #     doc_ref = db.collection("company-info").document(row["Company"])
-            #     doc_ref.set({
-            #         "Company": row["Company"],
-            #         "Type": row["Type"],
-            #         "Confidence Score": row["Confidence Score"]
-            #     })
-            #     print(f"Document {row['Company']} added to Firestore.")
 
 
             #connect to mongo db 
-            # client = MongoClient("mongodb://localhost:27017/")
-            # db = client["company_info"]
-            # collection = db["company_info"]
-            # print("connected to mongo db")
-            # # Insert the data into MongoDB
-            # #convert data to json format
-            # data = df.to_dict(orient="records")
-            # # Insert the data into MongoDB
-            # collection.create_index([("Company", 1)], unique=True)
-            # for record in data:
-            #     print(record)
-            #     if not collection.find_one({"Company": record["Company"]}):
-            #         collection.insert_one(record)
-            # # df.to_csv("company_types.csv", index=False)
-            # print("Data inserted into MongoDB successfully.", df)
+            mongo_user = os.getenv("MONGO_USER")
+            mongo_password = os.getenv("MONGO_PASSWORD")
+            client = MongoClient(f"mongodb+srv://{mongo_user}:{mongo_password}@hirewand-genai-cluster.dcovpmo.mongodb.net/?retryWrites=true&w=majority&appName=hirewand-genai-cluster")
+            db = client["company_info"]
+            collection = db["company_info"]
+            print("connected to mongo db")
+            # Insert the data into MongoDB
+            #convert data to json format
+            data = df.to_dict(orient="records")
+            # Insert the data into MongoDB
+            collection.create_index([("Company", 1)], unique=True)
+            for record in data:
+                print(record)
+                if not collection.find_one({"Company": record["Company"]}):
+                    collection.insert_one(record)
+            # df.to_csv("company_types.csv", index=False)
+            print("Data inserted into MongoDB successfully.", df)
             st.table(df)
         except Exception as e:
             st.error(f"An error occurred while processing company types: {e}")
